@@ -1,12 +1,14 @@
-# AssertJ Framework - Teste de Software
+# AssertJ + TestNG Framework - Teste de Software
 
 ## 1. Descrição do Framework
 
-AssertJ é uma biblioteca Java que fornece uma API fluente para escrever assertivas em testes. Desenvolvida para oferecer melhor legibilidade e expressividade comparada às assertivas tradicionais do JUnit, o AssertJ permite criar testes mais descritivos e fáceis de entender.
+AssertJ é uma biblioteca Java que fornece uma API fluente para escrever assertivas em testes. Desenvolvida para oferecer melhor legibilidade e expressividade comparada às assertivas tradicionais, o AssertJ permite criar testes mais descritivos e fáceis de entender.
 
 O framework se destaca pela sua sintaxe intuitiva, que segue o padrão "Given-When-Then" de forma natural, oferecendo métodos encadeados que tornam as verificações mais próximas da linguagem natural. Com suporte robusto para diferentes tipos de dados (coleções, strings, números, objetos customizados), AssertJ facilita a validação de condições complexas em testes unitários e de integração.
 
 Sua principal vantagem é a capacidade de fornecer mensagens de erro mais claras e detalhadas quando as assertivas falham, auxiliando significativamente no processo de debugging e manutenção de testes.
+
+**TestNG** é o framework de testes utilizado neste projeto, oferecendo recursos avançados como agrupamento de testes, dependências entre testes, execução paralela e relatórios detalhados. A combinação AssertJ + TestNG proporciona uma solução robusta para criação e execução de testes em Java.
 
 ## 2. Categorização do Framework
 
@@ -51,13 +53,29 @@ Cada teste valida se a funcionalidade atende aos requisitos esperados do ponto d
 
 ### Maven
 
-Adicione a dependência no `pom.xml`:
+Adicione as dependências no `pom.xml`:
 
 ```xml
+<!-- TestNG dependency -->
+<dependency>
+    <groupId>org.testng</groupId>
+    <artifactId>testng</artifactId>
+    <version>7.8.0</version>
+    <scope>test</scope>
+</dependency>
+
+<!-- AssertJ for fluent assertions -->
 <dependency>
     <groupId>org.assertj</groupId>
     <artifactId>assertj-core</artifactId>
     <version>3.24.2</version>
+    <scope>test</scope>
+</dependency>
+
+<!-- Mockito for mocking -->
+<dependency>
+    <groupId>org.mockito</groupId>
+    <artifactId>mockito-core</artifactId>
     <scope>test</scope>
 </dependency>
 ```
@@ -67,13 +85,19 @@ Adicione a dependência no `pom.xml`:
 Adicione no `build.gradle`:
 
 ```gradle
+testImplementation 'org.testng:testng:7.8.0'
 testImplementation 'org.assertj:assertj-core:3.24.2'
+testImplementation 'org.mockito:mockito-core:5.5.0'
 ```
 
-### Importação no Código
+### Importações no Código
 
 ```java
-import static org.assertj.core.api.Assertions.*;
+// TestNG
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+
+// AssertJ
 ```
 
 ## 4. Estratégias de Teste e Casos de Teste
@@ -93,7 +117,7 @@ import static org.assertj.core.api.Assertions.*;
 
 ```java
 @Test
-void findAll_withSavedUsers_returnsAllUsers() {
+public void findAll_withSavedUsers_returnsAllUsers() {
     // Given: Repositório com dois usuários
     var firstUser = createUser();
     var secondUser = createUser();
@@ -113,7 +137,7 @@ void findAll_withSavedUsers_returnsAllUsers() {
 
 ```java
 @Test
-void findAll_withEmptySavedUsers_returnsEmptyList() {
+public void findAll_withEmptySavedUsers_returnsEmptyList() {
     // Given: Repositório vazio
     when(userRepository.findAll()).thenReturn(Collections.emptyList());
 
@@ -142,7 +166,7 @@ void findAll_withEmptySavedUsers_returnsEmptyList() {
 
 ```java
 @Test
-void findById_withSavedUser_returnsUser() {
+public void findById_withSavedUser_returnsUser() {
     // Given: Usuário existente
     var expectedUser = createUser();
     var id = UUID.randomUUID();
@@ -158,7 +182,7 @@ void findById_withSavedUser_returnsUser() {
 
 ```java
 @Test
-void findById_withInvalidId_throwsIllegalArgumentException() {
+public void findById_withInvalidId_throwsIllegalArgumentException() {
     // Given: ID inexistente
     var id = UUID.randomUUID();
     when(userRepository.findById(id))
@@ -171,9 +195,29 @@ void findById_withInvalidId_throwsIllegalArgumentException() {
 }
 ```
 
-### Recursos AssertJ Utilizados:
+### Configuração TestNG com Mockito
 
-- `assertThat()`: Ponto de entrada principal
+```java
+public class UserServiceTest {
+
+    @InjectMocks
+    private UserService userService;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @BeforeMethod
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+}
+```
+
+### Recursos AssertJ + TestNG Utilizados:
+
+- `@Test`: Anotação TestNG para métodos de teste
+- `@BeforeMethod`: Configuração antes de cada teste
+- `assertThat()`: Ponto de entrada principal do AssertJ
 - `hasSize()`: Verificação de tamanho de coleções
 - `containsExactlyInAnyOrder()`: Validação de conteúdo de listas
 - `isEmpty()`: Verificação de coleção vazia
